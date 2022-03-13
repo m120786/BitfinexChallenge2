@@ -1,5 +1,6 @@
 package com.vb.bitfinechallenge.mainState
 
+import com.vb.bitfinechallenge.model.domain.CoinPair
 import com.vb.bitfinechallenge.model.domain.Ticker
 
 sealed class CoinState {
@@ -8,6 +9,7 @@ sealed class CoinState {
     object DoneLoading: CoinState()
 
     data class Pair(val name: String, val logo: Int, val ticker: Ticker): CoinState()
+    data class ListOfPairs(val list: ArrayList<CoinPair>): CoinState()
     data class Error(val error: String): CoinState()
 
 }

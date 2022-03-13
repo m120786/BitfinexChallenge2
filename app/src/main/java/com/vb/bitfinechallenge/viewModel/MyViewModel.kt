@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.vb.bitfinechallenge.R
 import com.vb.bitfinechallenge.intent.MyIntent
 import com.vb.bitfinechallenge.mainState.CoinState
+import com.vb.bitfinechallenge.model.domain.CoinPair
 import com.vb.bitfinechallenge.model.domain.Ticker
 import com.vb.bitfinechallenge.repository.TickerRepository
 import com.vb.bitfinechallenge.repository.TickerService
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 class MyViewModel(private val tickerService: TickerService): ViewModel() {
     val myIntent = MutableSharedFlow<MyIntent>()
     val state = MutableStateFlow<CoinState>(CoinState.Idle)
+    val coinPairList = ArrayList<CoinPair>()
 
     val iconDoge = R.drawable.ic_dogecoin_doge_logo
     val iconBTC = R.drawable.ic_wrapped_bitcoin_wbtc_logo
@@ -40,20 +42,19 @@ class MyViewModel(private val tickerService: TickerService): ViewModel() {
         viewModelScope.launch {
             myIntent.collect {
                 when (it) {
-                    is MyIntent.GetPair -> {
-                        coinMap.forEach { s, i -> getCoinById(s,i) }
-
+                    is MyIntent.GetPair -> { getCoins()
                     }
                 }
             }
         }
     }
 
-    private fun getCoinById(id: String, logo:Int) {
+    private fun getCoins() {
         viewModelScope.launch {
             state.value = CoinState.Loading
             state.value = try {
-                CoinState.Pair( id, logo,tickerService.getCoinById(id))
+                tickerService.getCoins()
+                CoinState.ListOfPairs(coinPairList)
             } catch (e: Exception) {
                 CoinState.Error(e.toString())
             }

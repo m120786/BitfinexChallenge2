@@ -20,7 +20,7 @@ fun CoinListView(myViewModel: MyViewModel) {
 //    var ticker by remember { mutableStateOf(Ticker(0.0,0.0,0.0,0.0,0.0,0.0,0f,0.0)) }
     var pair by remember { mutableStateOf(CoinPair( "btcusd", R.drawable.ic_dogecoin_doge_logo,Ticker(0.0,0.0,0.0,0.0,0.0,0.0,0f,0.0))) }
     val listOfCoins = remember { mutableStateOf(emptyList<Ticker>())}
-    var listOfPairs = mutableListOf<CoinPair>()
+    var listOfPairs = ArrayList<CoinPair>()
 
     var list = mutableListOf<Ticker>()
 
@@ -28,9 +28,8 @@ fun CoinListView(myViewModel: MyViewModel) {
         myViewModel.myIntent.emit(MyIntent.GetPair)
         myViewModel.state.collect {
             when (it) {
-                is CoinState.Pair -> {
-                    pair = CoinPair(it.name, it.logo,it.ticker)
-                    listOfPairs.add(pair)
+                is CoinState.ListOfPairs -> {
+                    listOfPairs = it.list
                 }
         }
         }
