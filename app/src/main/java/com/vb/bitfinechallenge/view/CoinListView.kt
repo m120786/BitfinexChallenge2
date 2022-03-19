@@ -1,44 +1,77 @@
 package com.vb.bitfinechallenge.view
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.vb.bitfinechallenge.R
-import com.vb.bitfinechallenge.intent.MyIntent
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.vb.bitfinechallenge.mainState.CoinState
 import com.vb.bitfinechallenge.model.domain.CoinPair
-import com.vb.bitfinechallenge.model.domain.Ticker
 import com.vb.bitfinechallenge.viewModel.MyViewModel
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @Composable
 fun CoinListView(myViewModel: MyViewModel) {
-//    var ticker by remember { mutableStateOf(Ticker(0.0,0.0,0.0,0.0,0.0,0.0,0f,0.0)) }
-    var pair by remember { mutableStateOf(CoinPair( "btcusd", R.drawable.ic_dogecoin_doge_logo,Ticker(0.0,0.0,0.0,0.0,0.0,0.0,0f,0.0))) }
-    val listOfCoins = remember { mutableStateOf(emptyList<Ticker>())}
-    var listOfPairs = ArrayList<CoinPair>()
 
-    var list = mutableListOf<Ticker>()
+    var listOfPairs = remember { mutableStateOf(ArrayList<CoinPair>()) }
+//var listOfPairs by mutableStateListOf<CoinPair>()
 
-    LaunchedEffect(Unit) {
-        myViewModel.myIntent.emit(MyIntent.GetPair)
-        myViewModel.state.collect {
-            when (it) {
-                is CoinState.ListOfPairs -> {
-                    listOfPairs = it.list
-                }
-        }
-        }
-    }
+//        myViewModel.myIntent.emit(MyIntent.GetPair)
+        val state = myViewModel.state.collectAsState()
+            when (state.value) {
+                is CoinState.ListOfPairs -> { LazyColumnContent((state.value as CoinState.ListOfPairs).list)}
+            }
+
+//    LazyColumnContent(listOfPairs)
+
+}
+
+@Composable
+private fun LazyColumnContent(listOfPairs: ArrayList<CoinPair>) {
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-        items(listOfPairs) {
-            Text("ticker"+ it.ticker)
+        items(listOfPairs, key = { it.id }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(2.dp),
+                shape = RoundedCornerShape(3.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = it.logo),
+                        contentDescription = "logo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(CircleShape)
+                    )
+                    Column(modifier = Modifier.padding(2.dp)) {
+                        Text("${it.id.take(3).uppercase()}")
+                        Text("${it.name}")
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Text("$ " + "${it.ticker.last_price}")
+                    }
+                }
+            }
+
         }
     }
-
 }
 

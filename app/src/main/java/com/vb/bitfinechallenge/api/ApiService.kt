@@ -7,6 +7,6 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("v1/pubticker/{pairId}")
-    suspend fun getPairById(@Path("pairId") pairId: String): Flow<TickerDto>
+    suspend fun getPairById(@Path("pairId") pairId: String): TickerDto
 
 }

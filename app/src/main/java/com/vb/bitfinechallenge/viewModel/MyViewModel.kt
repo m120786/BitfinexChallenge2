@@ -20,19 +20,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MyViewModel(private val tickerService: TickerService): ViewModel() {
-    val myIntent = MutableSharedFlow<MyIntent>()
+    val myIntent = MutableSharedFlow<MyIntent>(1,10)
     val state = MutableStateFlow<CoinState>(CoinState.Idle)
-    val coinPairList = ArrayList<CoinPair>()
-
-    val iconDoge = R.drawable.ic_dogecoin_doge_logo
-    val iconBTC = R.drawable.ic_wrapped_bitcoin_wbtc_logo
-    val iconLTC = R.drawable.ic_litecoin_ltc_logo
-    val iconETH = R.drawable.ic_ethereum_eth_logo
-    val iconXRP = R.drawable.ic_xrp_xrp_logo
-
-    var coinMap: HashMap<String, Int> = hashMapOf("btcusd" to iconBTC, "ltcusd" to iconLTC, "dogusd" to iconDoge, "xrpusd" to iconXRP, "ethusd" to iconETH)
-    var id = "btcusd"
-    val coinList = listOf("btcusd", "ltcusd", "dogusd", "xrpusd", "ethusd")
+    var coinPairList = ArrayList<CoinPair>()
 
     init {
         handleIntent()
@@ -53,7 +43,7 @@ class MyViewModel(private val tickerService: TickerService): ViewModel() {
         viewModelScope.launch {
             state.value = CoinState.Loading
             state.value = try {
-                tickerService.getCoins()
+                coinPairList = tickerService.getCoins()
                 CoinState.ListOfPairs(coinPairList)
             } catch (e: Exception) {
                 CoinState.Error(e.toString())
