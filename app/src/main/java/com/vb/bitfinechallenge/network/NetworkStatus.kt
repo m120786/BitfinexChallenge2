@@ -22,8 +22,7 @@ class NetworkStatus(context: Context) {
 
     fun registerForNetworkStatus() {
         connectivityManager.requestNetwork(networkRequest, object : ConnectivityManager.NetworkCallback() {
-            // network is available for use
-            override fun onAvailable(network: Network) {
+           override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 networkState.value = NetworkState.Available
             }
@@ -34,5 +33,9 @@ class NetworkStatus(context: Context) {
                 networkState.value = NetworkState.NotAvailable
             }
         })
+
+    }
+    fun unregisterForNetworkStatus() {
+        connectivityManager.unregisterNetworkCallback(ConnectivityManager.NetworkCallback())
     }
 }
