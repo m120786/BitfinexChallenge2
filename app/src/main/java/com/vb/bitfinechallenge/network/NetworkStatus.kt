@@ -21,7 +21,7 @@ class NetworkStatus(context: Context) {
     val connectivityManager = context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
 
     fun registerForNetworkStatus() {
-        connectivityManager.requestNetwork(networkRequest, object : ConnectivityManager.NetworkCallback() {
+        connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
            override fun onAvailable(network: Network) {
                 super.onAvailable(network)
                 networkState.value = NetworkState.Available
